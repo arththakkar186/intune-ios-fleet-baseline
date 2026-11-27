@@ -1,0 +1,28 @@
+{
+  "@odata.type": "#microsoft.graph.iosCompliancePolicy",
+  "displayName": "iOS - Corporate - Compliance baseline",
+  "description": "Managed by intune-ios-fleet-baseline. Corporate-owned, supervised iPhone and iPad.",
+  "passcodeRequired": true,
+  "passcodeBlockSimple": true,
+  "passcodeMinimumLength": 6,
+  "passcodeRequiredType": "numeric",
+  "passcodeMinutesOfInactivityBeforeLock": 5,
+  "passcodeMinutesOfInactivityBeforeScreenTimeout": 5,
+  "passcodePreviousPasscodeBlockCount": 5,
+  "passcodeExpirationDays": null,
+  "osMinimumVersion": "18.7",
+  "osMaximumVersion": null,
+  "securityBlockJailbrokenDevices": true,
+  "deviceThreatProtectionEnabled": true,
+  "deviceThreatProtectionRequiredSecurityLevel": "medium",
+  "managedEmailProfileRequired": false,
+  "restrictedApps": [],
+  "scheduledActionsForRule": [
+    {
+      "ruleName": "PasswordRequired",
+      "scheduledActionConfigurations": [
+        { "actionType": "block", "gracePeriodHours": 24, "notificationTemplateId": "", "notificationMessageCCList": [] }
+      ]
+    }
+  ]
+}

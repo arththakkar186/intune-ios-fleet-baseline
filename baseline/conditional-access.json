@@ -1,0 +1,27 @@
+{
+  "$comment": "Two Conditional Access policies that make the baseline enforceable. Deployed in report-only first (state enabledForReportingButNotEnforced). Group names are resolved at deploy time.",
+  "policies": [
+    {
+      "displayName": "CA-iOS-01 Corporate iOS: require compliant device for Microsoft 365",
+      "state": "enabledForReportingButNotEnforced",
+      "conditions": {
+        "users": { "includeGroups": ["IOS-Corporate-Users"], "excludeGroups": ["CA-Exclude-BreakGlass"] },
+        "applications": { "includeApplications": ["Office365"] },
+        "platforms": { "includePlatforms": ["iOS"] },
+        "clientAppTypes": ["browser", "mobileAppsAndDesktopClients"]
+      },
+      "grantControls": { "operator": "OR", "builtInControls": ["compliantDevice"] }
+    },
+    {
+      "displayName": "CA-iOS-02 All iOS: require app protection policy for Microsoft 365",
+      "state": "enabledForReportingButNotEnforced",
+      "conditions": {
+        "users": { "includeUsers": ["All"], "excludeGroups": ["CA-Exclude-BreakGlass"] },
+        "applications": { "includeApplications": ["Office365"] },
+        "platforms": { "includePlatforms": ["iOS"] },
+        "clientAppTypes": ["mobileAppsAndDesktopClients"]
+      },
+      "grantControls": { "operator": "OR", "builtInControls": ["compliantApplication"] }
+    }
+  ]
+}

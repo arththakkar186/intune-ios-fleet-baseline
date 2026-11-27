@@ -1,0 +1,44 @@
+name: validate
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  baseline:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Baseline meets the security standard
+        run: python tools/validate.py
+      - name: Unit tests (validator, generator, report)
+        run: python -m unittest discover -s tests -v
+      - name: Report on synthetic fleet
+        run: python tools/fleet_report.py --data data/synthetic --out out
+
+  powershell:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v4
+      - name: Parse every script
+        run: |
+          $bad = 0
+          Get-ChildItem scripts -Filter *.ps1 | ForEach-Object {
+            $errors = $null
+            [System.Management.Automation.Language.Parser]::ParseFile($_.FullName, [ref]$null, [ref]$errors) | Out-Null
+            if ($errors) { $errors | ForEach-Object { Write-Host "$($_.Extent.File):$($_.Extent.StartLineNumber) $($_.Message)" }; $bad++ }
+          }
+          if ($bad) { exit 1 }
+      - name: PSScriptAnalyzer
+        run: |
+          Set-PSRepository PSGallery -InstallationPolicy Trusted
+          Install-Module PSScriptAnalyzer -Force -Scope CurrentUser
+          $r = Invoke-ScriptAnalyzer -Path scripts -Recurse -Severity Error,Warning -ExcludeRule PSAvoidUsingWriteHost,PSUseShouldProcessForStateChangingFunctions
+          $r | Format-Table -AutoSize
+          if ($r) { exit 1 }

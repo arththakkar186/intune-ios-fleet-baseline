@@ -1,0 +1,23 @@
+{
+  "$comment": "Which Entra groups receive each baseline object. Dynamic device groups use the enrollment profile name so only ADE devices get supervised-only settings.",
+  "groups": {
+    "IOS-Corporate-Devices": {
+      "type": "dynamic-device",
+      "rule": "(device.deviceOSType -eq \"iPhone\" -or device.deviceOSType -eq \"iPad\") -and (device.enrollmentProfileName -eq \"iOS - Corporate - ADE user affinity\")"
+    },
+    "IOS-Corporate-Users": { "type": "assigned-user" },
+    "IOS-Pilot-Devices": { "type": "assigned-device" },
+    "IOS-Ring1-Devices": { "type": "assigned-device" },
+    "MAM-Licensed-Users": { "type": "dynamic-user", "rule": "user.assignedPlans -any (assignedPlan.service -eq \"SCO\" -and assignedPlan.capabilityStatus -eq \"Enabled\")" }
+  },
+  "assignments": {
+    "compliance-ios.json": ["IOS-Corporate-Devices"],
+    "restrictions-ios.json": ["IOS-Corporate-Devices"],
+    "app-protection-ios.json": ["MAM-Licensed-Users"]
+  },
+  "rings": [
+    { "name": "Ring 0 - IT pilot", "group": "IOS-Pilot-Devices", "share": "about 2%", "soakDays": 7 },
+    { "name": "Ring 1 - Early adopters", "group": "IOS-Ring1-Devices", "share": "about 10%", "soakDays": 7 },
+    { "name": "Ring 2 - Broad", "group": "IOS-Corporate-Devices", "share": "rest", "soakDays": 0 }
+  ]
+}
