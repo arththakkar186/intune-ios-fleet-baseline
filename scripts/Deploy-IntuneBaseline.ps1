@@ -36,7 +36,9 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-function Read-Baseline([string]$Name) { Get-Content -Raw (Join-Path $BaselinePath $Name) | ConvertFrom-Json -AsHashtable }
+$baselineDir = (Resolve-Path -Path $BaselinePath).Path
+
+function Read-Baseline([string]$Name) { Get-Content -Raw (Join-Path $baselineDir $Name) | ConvertFrom-Json -AsHashtable }
 
 function Invoke-Graph {
     param([string]$Method = 'GET', [string]$Uri, $Body)
@@ -58,6 +60,7 @@ function Get-GroupId([string]$Name) {
 }
 
 function Set-BaselineObject {
+    [CmdletBinding(SupportsShouldProcess)]
     param([string]$Collection, [hashtable]$Body, [string]$Kind)
     $existing = Get-ByName -Collection $Collection -Name $Body.displayName
     if ($existing) {
